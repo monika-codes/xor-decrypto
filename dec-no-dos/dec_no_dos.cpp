@@ -1,11 +1,10 @@
-/** \file		dec_no_dos.cpp
+/** 	\file		dec_no_dos.cpp
 	\brief		Console intereface to run the program
 	\details	The aim of the program is to decrypt an EXE file encrypted with XOR with ECB mode. It is based on the fact that the key used in XOR encryption with ECB mode, will be easily spotable over a string of bytes of 0.
 	\author		Monika Olchowik
 	\date		12.2016
 	\version	1.0
 */
-
 #include<getopt.h>
 #include<unistd.h>
 #include<cmath>
@@ -15,14 +14,11 @@
 
 using namespace std;
 
-
-
 /**
 	\brief		Function printing the usage message of the function
 	
 	\arg		\c	argv	Arguments containing the name of the file
 */
-
 void printf_usage(char** argv)
 {
 	printf("Usage:\n\t %s [FILE_ENCRYPTED] [FILE_DECRYPTED] [OPTIONS] ... \n", argv[0]);
@@ -44,17 +40,15 @@ void printf_usage(char** argv)
 */
 int set_parameters(int argc, char** argv, int& text_size, bool& reverse, char* fenc, char* fdec)
 {
-
 	struct option long_options[] =
 	{
 		{"size",	required_argument, 	0, 	's'},
 		{"reverse",	no_argument,	 	0, 	'r'},
 		{"help", 	no_argument, 		0, 	'h'},
-		{"version", no_argument, 		0, 	'v'},
-		{0,			0,					0,	0}
+		{"version", 	no_argument, 		0, 	'v'},
+		{0,		0,			0,	0}
 
 	};
-
 
 	// Default values
 	text_size = 16000;
@@ -95,38 +89,31 @@ int set_parameters(int argc, char** argv, int& text_size, bool& reverse, char* f
 
 		// If the file should be reversed
 		if(c == 'r')
-			reverse = true;
-			
+			reverse = true;		
 	}	
 	return 0;
 }
 
-
-
-
 int main(int argc, char** argv)
 {
-
 	int text_size;				
 	int read_counter = 0;
 	bool reverse;
 	char* fenc = argv[1];
 	char* fdec = argv[2];
-	const char frev[] = {"reverse.dec_no_dos"};
 
 	unsigned char buff[BUFF_SIZE];		// Buffer in which the data will be kept
 	unsigned char key[MAX_KEY_SIZE];	// The most probable key
 
-	buff[0] = '1';
+	buff[0] = '0';
 
 	if(set_parameters(argc, argv, text_size, reverse, fenc, fdec) == -1)
 		return -1;
 
-
 	// Helpful for hashing algorithm used
 	p[0] = 1;
-	for(int i = 1; i < BUFF_SIZE; i++) p[i] = p[i - 1] * MAXP;
-
+	for(int i = 1; i < BUFF_SIZE; i++) 
+		p[i] = p[i - 1] * MAXP;
 
 	// Reading (and possibly reversing the file)
 	FILE* f_read = fopen(fenc, "rb");
@@ -149,17 +136,18 @@ int main(int argc, char** argv)
 	
 	}
 	
-	if(text_size > read_counter) text_size = read_counter;
+	if(text_size > read_counter) 
+		text_size = read_counter;
 
 	// Finding keys
 	double ratio;
 	int diff;
 	int key_length = make_key(buff, key, text_size, ratio, diff);
 
-	if(key_length == -1) return ERR_NO_KEY;
+	if(key_length == -1) 
+		return ERR_NO_KEY;
 
-	printkey(key, key_length, ratio, diff);
-
+	printkey(key, key_length);
 
 	// Decrypting file
 	FILE* f_write = fopen(fdec, "wb");
@@ -174,18 +162,19 @@ int main(int argc, char** argv)
 
     
 	// Saving the file
-	if(diff > 0) fwrite(DOS_STUB, sizeof(char), diff, f_write);
+	if(diff > 0) 
+		fwrite(DOS_STUB, sizeof(char), diff, f_write);
 
-	if (diff < 0) fwrite(buff - diff, sizeof(char), read_counter, f_write);
-	else fwrite(buff, sizeof(char), read_counter, f_write);
+	if (diff < 0) 
+		fwrite(buff - diff, sizeof(char), read_counter, f_write);
+	else 
+		fwrite(buff, sizeof(char), read_counter, f_write);
 
 	read_counter -= BUFF_SIZE;
 
-		
 	fclose(f_write);
 	fclose(f_read);
-
-
+	
 	return 0;
 }
 
