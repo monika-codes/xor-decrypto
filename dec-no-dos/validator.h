@@ -1,7 +1,7 @@
 #ifndef VALIDATOR_H_
 #define VALIDATOR_H_
 
-#include<vector>
+#include <vector>
 #include "parameters.h"
 
 namespace xorDecryptor{
